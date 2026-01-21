@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<psalm
+    resolveFromConfigFile="true"
+    memoizeMethodCallResults="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="src" />
+    </projectFiles>
+
+    <issueHandlers>
+        <!-- Normal for libraries: classes/methods are used by consumers, not internally -->
+        <UnusedClass errorLevel="suppress" />
+        <PossiblyUnusedMethod errorLevel="suppress" />
+    </issueHandlers>
+</psalm>

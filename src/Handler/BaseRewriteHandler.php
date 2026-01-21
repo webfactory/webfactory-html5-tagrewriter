@@ -7,6 +7,7 @@ namespace Webfactory\Html5TagRewriter\Handler;
 use Dom\Document;
 use Dom\Element;
 use Dom\XPath;
+use Override;
 use Webfactory\Html5TagRewriter\RewriteHandler;
 
 /**
@@ -14,10 +15,12 @@ use Webfactory\Html5TagRewriter\RewriteHandler;
  */
 abstract class BaseRewriteHandler implements RewriteHandler
 {
+    #[Override]
     public function match(Element $element): void
     {
     }
 
+    #[Override]
     public function afterMatches(Document $document, XPath $xpath): void
     {
     }

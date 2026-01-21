@@ -1,0 +1,32 @@
+name: Static Analysis
+
+permissions:
+    contents: read
+    packages: read
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+
+env:
+    PHP_VERSION: 8.4
+    PSALM_VERSION: 6.14.3
+
+jobs:
+    Psalm:
+        name: Psalm
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: shivammathur/setup-php@v2
+                with:
+                  php-version: ${{ env.PHP_VERSION }}
+                  coverage: none
+                  tools: composer:v2
+            -   uses: actions/checkout@v4
+            -   run:  composer install --no-interaction --no-progress --ansi --no-scripts
+            -   name: Run Psalm
+                run: |
+                    docker pull --quiet ghcr.io/webfactory/psalm:$PSALM_VERSION
+                    docker run --tty -v $(pwd):/app -v $HOME/cache:/cache ghcr.io/webfactory/psalm:$PSALM_VERSION --show-info=false --stats --output-format=github
