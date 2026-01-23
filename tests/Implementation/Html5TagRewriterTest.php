@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Webfactory\Html5TagRewriter\Tests;
+namespace Webfactory\Html5TagRewriter\Tests\Implementation;
 
 use Dom\Element;
 use PHPUnit\Framework\Attributes\DataProvider;
