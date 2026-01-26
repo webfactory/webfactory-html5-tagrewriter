@@ -28,7 +28,7 @@ $fragment = '<p>Hello <strong>World</strong></p>';
 $result = $rewriter->processBodyFragment($fragment);
 ```
 
-> ![NOTE]
+> [!NOTE]
 > The `processBodyFragment()` method is currently limited in that it can only process
 > HTML strings that come from within the `<body>` section. This has to do with the 
 > HTML 5 parsing rules defining different [parsing states](https://html.spec.whatwg.org/multipage/parsing.html#parse-state),
