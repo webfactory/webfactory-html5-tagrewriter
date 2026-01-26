@@ -35,25 +35,26 @@ final class Html5TagRewriter implements TagRewriter
     }
 
     #[Override]
-    public function processFragment(string $html5Fragment): string
+    public function processBodyFragment(string $html5Fragment): string
     {
-        $document = HTMLDocument::createEmpty();
-        $container = $document->createElement('container');
-        $document->appendChild($container);
-
-        $temp = $document->createElement('temp');
-        $temp->innerHTML = $html5Fragment;
-
-        while ($temp->firstChild instanceof Node) {
-            $container->appendChild($temp->firstChild);
-        }
+        /*
+         * Different parser states and tokenization modes
+         * (https://html.spec.whatwg.org/multipage/parsing.html#parse-state,
+         * https://html.spec.whatwg.org/multipage/parsing.html#tokenization)
+         * may apply at different parts of the HTML input. Currently, there is
+         * no (documented) way to create HTML fragements with the necessary
+         * context with the new DOM API. So, for the time being, we must restrict
+         * handling of fragments to such inputs that can equally be considered to be
+         * placed directly after the `<body>` tag.
+         */
+        $document = HTMLDocument::createFromString('', overrideEncoding: 'utf-8');
+        /** @var \Dom\HTMLElement $container */
+        $container = $document->body;
+        $container->innerHTML = $html5Fragment;
 
         $this->applyHandlers($document, $container);
 
-        /** @var string */
-        $innerHTML = $container->innerHTML;
-
-        return $this->cleanup($innerHTML);
+        return $this->cleanup($container->innerHTML);
     }
 
     private function applyHandlers(Document $document, Node $context): void

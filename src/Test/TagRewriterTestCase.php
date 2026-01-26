@@ -19,7 +19,7 @@ abstract class TagRewriterTestCase extends TestCase
 
     public function assertRewriteResultEquals(string $expected, string $input): void
     {
-        $result = $this->rewriter->processFragment($input);
+        $result = $this->rewriter->processBodyFragment($input);
 
         $this->assertXmlStringEqualsXmlString($expected, $result);
     }

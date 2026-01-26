@@ -8,5 +8,5 @@ interface TagRewriter
 
     public function process(string $html5): string;
 
-    public function processFragment(string $html5Fragment): string;
+    public function processBodyFragment(string $html5Fragment): string;
 }

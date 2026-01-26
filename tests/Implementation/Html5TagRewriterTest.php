@@ -157,9 +157,14 @@ class Html5TagRewriterTest extends TestCase
             'Just plain text',
         ];
 
-        yield 'simple element' => [
+        yield 'simple element from body (parsing in "data state")' => [
             '<p>Hello</p>',
         ];
+
+        // Results for processing <head> content are undefined for now
+        // yield 'tags from head (parsing in "data state")' => [
+        //     '<title>Test no tags here</title><meta name="description" content="test">',
+        // ];
 
         yield 'mixed content' => [
             'Text before <em>emphasized</em> text after',
@@ -184,9 +189,9 @@ class Html5TagRewriterTest extends TestCase
 
     #[Test]
     #[DataProvider('providePreservedFragments')]
-    public function processFragment_preserves_fragment(string $fragment): void
+    public function processBodyFragment_preserves_fragment(string $fragment): void
     {
-        $result = $this->rewriter->processFragment($fragment);
+        $result = $this->rewriter->processBodyFragment($fragment);
 
         self::assertSame($fragment, $result);
     }
@@ -202,19 +207,64 @@ class Html5TagRewriterTest extends TestCase
             '<p>&lt;script&gt; &amp; &quot;quotes&quot;</p>',
             '<p>&lt;script&gt; &amp; "quotes"</p>',
         ];
+
+        yield 'textarea uses RCDATA state' => [
+            '<textarea><h1>Some HTML</h1><p>textarea content</p></textarea>',
+            '<textarea>&lt;h1&gt;Some HTML&lt;/h1&gt;&lt;p&gt;textarea content&lt;/p&gt;</textarea>',
+        ];
+
+        // Results for processing <head> content are undefined for now
+        // yield 'title tag from head uses RCDATA state' => [
+        //     '<title>Test <h1> no tags here</title>',
+        //     '<title>Test &lt;h1&gt; no tags here</title>',
+        // ];
     }
 
     #[Test]
     #[DataProvider('provideFragmentsCleanedUp')]
-    public function processFragment_cleans_up_fragment(string $input, string $expected): void
+    public function processBodyFragment_cleans_up_fragment(string $input, string $expected): void
     {
-        $result = $this->rewriter->processFragment($input);
+        $result = $this->rewriter->processBodyFragment($input);
 
         self::assertSame($expected, $result);
     }
 
+    public static function provideFragmentsWithBrokenHandling(): iterable
+    {
+        yield 'full head section' => [
+            '<head><title>Test</title><meta name="description" content="test"></head>',
+        ];
+
+        yield 'empty head section' => [
+            '<head></head>',
+        ];
+
+        yield 'body with content' => [
+            '<body><p>test</p><p>more test</p></body>',
+        ];
+
+        yield 'empty body' => [
+            '<body></body>',
+        ];
+
+        yield 'head and body with content' => [
+            '<head><title>Test</title></head><body><p>test</p></body>',
+        ];
+
+        yield 'empty head and body' => [
+            '<head></head><body></body>',
+        ];
+    }
+
     #[Test]
-    public function processFragment_applies_handler(): void
+    #[DataProvider('provideFragmentsWithBrokenHandling')]
+    public function processBodyFragment_currently_cannot_process_fragments_with_head_or_body_tags(string $input): void
+    {
+        $this->markTestSkipped('Parsing of fragments that are not part of the `body` is currently not supported.');
+    }
+
+    #[Test]
+    public function processBodyFragment_applies_handler(): void
     {
         $handler = new TestRewriteHandler('//html:strong');
         $handler->onMatch(function (Element $element) {
@@ -222,17 +272,17 @@ class Html5TagRewriterTest extends TestCase
         });
 
         $this->rewriter->register($handler);
-        $result = $this->rewriter->processFragment('<strong>Text</strong>');
+        $result = $this->rewriter->processBodyFragment('<strong>Text</strong>');
 
         self::assertSame('<strong class="bold">Text</strong>', $result);
     }
 
     #[Test]
-    public function processFragment_matches_multiple_elements(): void
+    public function processBodyFragment_matches_multiple_elements(): void
     {
         $handler = new TestRewriteHandler('//html:p');
         $this->rewriter->register($handler);
-        $this->rewriter->processFragment('<p>First</p><p>Second</p><p>Third</p>');
+        $this->rewriter->processBodyFragment('<p>First</p><p>Second</p><p>Third</p>');
 
         self::assertSame(3, $handler->matchCallCount);
     }
@@ -246,7 +296,7 @@ class Html5TagRewriterTest extends TestCase
         $this->rewriter->register($handler1);
         $this->rewriter->register($handler2);
 
-        $this->rewriter->processFragment('<p>paragraph</p><div>div section</div>');
+        $this->rewriter->processBodyFragment('<p>paragraph</p><div>div section</div>');
 
         self::assertSame(1, $handler1->matchCallCount);
         self::assertSame(1, $handler2->matchCallCount);
@@ -258,7 +308,7 @@ class Html5TagRewriterTest extends TestCase
         $handler = new TestRewriteHandler('//html:a');
         $this->rewriter->register($handler);
 
-        $this->rewriter->processFragment('<a href="#">Link 1</a><a href="#">Link 2</a>');
+        $this->rewriter->processBodyFragment('<a href="#">Link 1</a><a href="#">Link 2</a>');
 
         self::assertSame(2, $handler->matchCallCount);
     }
@@ -270,7 +320,7 @@ class Html5TagRewriterTest extends TestCase
         $this->rewriter->register($handler);
 
         $svg = '<svg><circle cx="50" cy="50" r="40"/></svg>';
-        $this->rewriter->processFragment($svg);
+        $this->rewriter->processBodyFragment($svg);
 
         self::assertSame(1, $handler->matchCallCount);
     }
@@ -282,7 +332,7 @@ class Html5TagRewriterTest extends TestCase
         $this->rewriter->register($handler);
 
         $mathml = '<math><mrow><mi>x</mi></mrow></math>';
-        $this->rewriter->processFragment($mathml);
+        $this->rewriter->processBodyFragment($mathml);
 
         self::assertSame(1, $handler->matchCallCount);
     }
@@ -293,7 +343,7 @@ class Html5TagRewriterTest extends TestCase
         $handler = new TestRewriteHandler('//html:p');
         $this->rewriter->register($handler);
 
-        $this->rewriter->processFragment('<p>1</p><p>2</p><p>3</p><p>4</p><p>5</p>');
+        $this->rewriter->processBodyFragment('<p>1</p><p>2</p><p>3</p><p>4</p><p>5</p>');
 
         self::assertSame(5, $handler->matchCallCount);
         self::assertCount(5, $handler->matchedElements);
@@ -313,7 +363,7 @@ class Html5TagRewriterTest extends TestCase
         });
 
         $this->rewriter->register($handler);
-        $this->rewriter->processFragment('<p>1</p><p>2</p>');
+        $this->rewriter->processBodyFragment('<p>1</p><p>2</p>');
 
         self::assertSame(['match', 'match', 'afterMatches'], $callOrder);
     }
@@ -331,7 +381,7 @@ class Html5TagRewriterTest extends TestCase
         });
 
         $this->rewriter->register($handler);
-        $this->rewriter->processFragment('<p>Test</p>');
+        $this->rewriter->processBodyFragment('<p>Test</p>');
 
         self::assertNotNull($receivedDocument);
         self::assertNotNull($receivedXPath);
@@ -343,7 +393,7 @@ class Html5TagRewriterTest extends TestCase
         $handler = new TestRewriteHandler('//html:nonexistent');
         $this->rewriter->register($handler);
 
-        $this->rewriter->processFragment('<p>No matching elements</p>');
+        $this->rewriter->processBodyFragment('<p>No matching elements</p>');
 
         self::assertSame(0, $handler->matchCallCount);
         self::assertSame(1, $handler->afterMatchesCallCount);
@@ -359,7 +409,7 @@ class Html5TagRewriterTest extends TestCase
         });
 
         $this->rewriter->register($handler);
-        $result = $this->rewriter->processFragment('<a href="/page">Link</a>');
+        $result = $this->rewriter->processBodyFragment('<a href="/page">Link</a>');
 
         self::assertStringContainsString('rel="noopener"', $result);
         self::assertStringContainsString('target="_blank"', $result);
@@ -374,7 +424,7 @@ class Html5TagRewriterTest extends TestCase
         });
 
         $this->rewriter->register($handler);
-        $result = $this->rewriter->processFragment('<p>Hello</p>');
+        $result = $this->rewriter->processBodyFragment('<p>Hello</p>');
 
         self::assertStringContainsString('<strong>Hello</strong>', $result);
     }
@@ -388,7 +438,7 @@ class Html5TagRewriterTest extends TestCase
         });
 
         $this->rewriter->register($handler);
-        $result = $this->rewriter->processFragment('<p>Text</p><script>alert("evil")</script><p>More</p>');
+        $result = $this->rewriter->processBodyFragment('<p>Text</p><script>alert("evil")</script><p>More</p>');
 
         self::assertStringNotContainsString('<script>', $result);
         self::assertStringNotContainsString('alert', $result);
@@ -408,7 +458,7 @@ class Html5TagRewriterTest extends TestCase
         });
 
         $this->rewriter->register($handler);
-        $result = $this->rewriter->processFragment('<p>Original</p>');
+        $result = $this->rewriter->processBodyFragment('<p>Original</p>');
 
         self::assertSame('<p>Original<span>[added]</span></p>', $result);
     }
@@ -428,7 +478,7 @@ class Html5TagRewriterTest extends TestCase
         });
 
         $this->rewriter->register($handler);
-        $this->rewriter->processFragment('<ul><li>A</li><li>B</li><li>C</li></ul>');
+        $this->rewriter->processBodyFragment('<ul><li>A</li><li>B</li><li>C</li></ul>');
     }
 
     #[Test]
@@ -459,7 +509,7 @@ class Html5TagRewriterTest extends TestCase
         $this->rewriter->register($handler1);
         $this->rewriter->register($handler2);
 
-        $result = $this->rewriter->processFragment('<a href="#">Test</a>');
+        $result = $this->rewriter->processBodyFragment('<a href="#">Test</a>');
 
         self::assertStringContainsString('class="link external"', $result);
     }

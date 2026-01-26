@@ -25,8 +25,18 @@ $result = $rewriter->process($html);
 
 // Process an HTML fragment
 $fragment = '<p>Hello <strong>World</strong></p>';
-$result = $rewriter->processFragment($fragment);
+$result = $rewriter->processBodyFragment($fragment);
 ```
+
+> [!NOTE]
+> The `processBodyFragment()` method is currently limited in that it can only process
+> HTML strings that come from within the `<body>` section. This has to do with the 
+> HTML 5 parsing rules defining different [parsing states](https://html.spec.whatwg.org/multipage/parsing.html#parse-state),
+> and the PHP DOM API for the HTML 5 parser does currently not expose
+> a (documented) way to create fragments and passing the required context information.
+> For correct results, you should limit its usage to fragments that shall be processed 
+> starting in the `in body` parsing state and where the `data state` [tokenization mode](https://html.spec.whatwg.org/multipage/parsing.html#tokenization)
+> is active.
 
 ### Creating a Handler
 
