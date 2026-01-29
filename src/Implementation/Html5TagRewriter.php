@@ -77,11 +77,11 @@ final class Html5TagRewriter implements TagRewriter
 
     private function convertEsiSelfClosingTagsToEmptyElements(string $html): string
     {
-        return preg_replace('#(<esi:([a-z]+)(?:[^>]*))/>#i', '$1></esi:\\2>', $html);
+        return preg_replace('#(<esi:([a-z]+)(?:[^>]*))/>#i', '$1></esi:\\2>', $html) ?? $html;
     }
 
     private function convertEsiEmptyElementsToSelfClosingTags(string $html): string
     {
-        return preg_replace('#(<esi:([a-z]+)(?:[^>]*))></esi:\\2>#i', '$1 />', $html);
+        return preg_replace('#(<esi:([a-z]+)(?:[^>]*))></esi:\\2>#i', '$1 />', $html) ?? $html;
     }
 }
