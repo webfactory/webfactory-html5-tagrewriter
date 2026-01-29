@@ -6,6 +6,9 @@
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
 >
+    <stubs>
+        <file name="psalm-stubs/php_dom.stub.php" />
+    </stubs>
     <projectFiles>
         <directory name="src" />
     </projectFiles>

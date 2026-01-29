@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Webfactory\Html5TagRewriter\Tests\Implementation;
 
 use Dom\Element;
+use Dom\Node;
+use Dom\Text;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -338,6 +340,22 @@ class Html5TagRewriterTest extends TestCase
     }
 
     #[Test]
+    public function handler_can_match_non_element_nodes(): void
+    {
+        $handler = new TestRewriteHandler('//html:p/text()');
+        $handler->onMatch(function (Node $node) {
+            self::assertNotInstanceOf(Element::class, $node);
+            self::assertInstanceOf(Text::class, $node);
+            self::assertSame('test', $node->textContent);
+        });
+
+        $this->rewriter->register($handler);
+        $this->rewriter->processBodyFragment('<p>test</p>');
+
+        self::assertSame(1, $handler->matchCallCount);
+    }
+
+    #[Test]
     public function handler_match_is_called_for_each_matching_element(): void
     {
         $handler = new TestRewriteHandler('//html:p');
@@ -346,7 +364,7 @@ class Html5TagRewriterTest extends TestCase
         $this->rewriter->processBodyFragment('<p>1</p><p>2</p><p>3</p><p>4</p><p>5</p>');
 
         self::assertSame(5, $handler->matchCallCount);
-        self::assertCount(5, $handler->matchedElements);
+        self::assertCount(5, $handler->matchedNodes);
     }
 
     #[Test]

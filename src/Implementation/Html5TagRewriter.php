@@ -48,8 +48,9 @@ final class Html5TagRewriter implements TagRewriter
          * placed directly after the `<body>` tag.
          */
         $document = HTMLDocument::createFromString('', overrideEncoding: 'utf-8');
-        /** @var \Dom\HTMLElement $container */
         $container = $document->body;
+        assert($container !== null);
+
         $container->innerHTML = $html5Fragment;
 
         $this->applyHandlers($document, $container);
@@ -65,10 +66,10 @@ final class Html5TagRewriter implements TagRewriter
         $xpath->registerNamespace('mathml', 'http://www.w3.org/1998/Math/MathML');
 
         foreach ($this->rewriteHandlers as $handler) {
-            /** @var iterable<Element> */
-            $elements = $xpath->query($handler->appliesTo(), $context);
-            foreach ($elements as $element) {
-                $handler->match($element);
+            /** @var iterable<Node> $nodeList */
+            $nodeList = $xpath->query($handler->appliesTo(), $context);
+            foreach ($nodeList as $node) {
+                $handler->match($node);
             }
             $handler->afterMatches($document, $xpath);
         }

@@ -1,6 +1,7 @@
 <?php
 
 use Dom\Element;
+use Dom\Node;
 use Webfactory\Html5TagRewriter\Handler\BaseRewriteHandler;
 use Webfactory\Html5TagRewriter\Implementation\Html5TagRewriter;
 
@@ -13,10 +14,11 @@ class DemoRewriteHandler extends BaseRewriteHandler
         return '//html:a';
     }
 
-    public function match(Element $element): void
+    public function match(Node $node): void
     {
-        $element->setAttribute('href', 'https://github.com/webfactory/html5-tagrewriter');
-        $element->textContent = 'check this out';
+        assert($node instanceof Element);
+        $node->setAttribute('href', 'https://github.com/webfactory/html5-tagrewriter');
+        $node->textContent = 'check this out';
     }
 }
 

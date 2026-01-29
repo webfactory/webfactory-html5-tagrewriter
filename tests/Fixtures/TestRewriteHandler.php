@@ -6,6 +6,7 @@ namespace Webfactory\Html5TagRewriter\Tests\Fixtures;
 
 use Dom\Document;
 use Dom\Element;
+use Dom\Node;
 use Dom\XPath;
 use Webfactory\Html5TagRewriter\RewriteHandler;
 
@@ -17,7 +18,7 @@ class TestRewriteHandler implements RewriteHandler
     private string $xpath;
 
     /** @var list<Element> */
-    public array $matchedElements = [];
+    public array $matchedNodes = [];
 
     public int $matchCallCount = 0;
 
@@ -39,13 +40,13 @@ class TestRewriteHandler implements RewriteHandler
         return $this->xpath;
     }
 
-    public function match(Element $element): void
+    public function match(Node $node): void
     {
         $this->matchCallCount++;
-        $this->matchedElements[] = $element;
+        $this->matchedNodes[] = $node;
 
         if ($this->matchCallback !== null) {
-            ($this->matchCallback)($element);
+            ($this->matchCallback)($node);
         }
     }
 

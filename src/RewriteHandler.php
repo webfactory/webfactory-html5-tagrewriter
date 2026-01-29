@@ -4,6 +4,7 @@ namespace Webfactory\Html5TagRewriter;
 
 use Dom\Document;
 use Dom\Element;
+use Dom\Node;
 use Dom\XPath;
 
 /**
@@ -46,9 +47,9 @@ interface RewriteHandler
      * If you need to perform batch operations after all elements have been visited,
      * collect the elements here and process them in afterMatches().
      *
-     * @param Element $element The DOM element that matched the XPath expression
+     * @param Node $node The DOM node that matched the XPath expression
      */
-    public function match(Element $element): void;
+    public function match(Node $node): void;
 
     /**
      * Called once after all matching elements have been passed to match().

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Webfactory\Html5TagRewriter\Handler;
 
 use Dom\Document;
-use Dom\Element;
+use Dom\Node;
 use Dom\XPath;
 use Override;
 use Webfactory\Html5TagRewriter\RewriteHandler;
@@ -16,7 +16,7 @@ use Webfactory\Html5TagRewriter\RewriteHandler;
 abstract class BaseRewriteHandler implements RewriteHandler
 {
     #[Override]
-    public function match(Element $element): void
+    public function match(Node $node): void
     {
     }
 
