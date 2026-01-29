@@ -1,6 +1,6 @@
 <?php
 
-// Taken from https://github.com/php/php-src/blob/ea75635f1daa18c0244190d2413dec21a3d26bad/ext/dom/php_dom.stub.php
+// Taken from https://github.com/php/php-src/blame/b437f2b32eb364c9496d24abcc734272e5c9c980/ext/dom/php_dom.stub.php
 
 /** @generate-class-entries */
 
@@ -149,9 +149,9 @@ namespace
 
     /**
      * @var int
+     * @deprecated is no longer used since 8.4
      * @cvalue PHP_ERR
      */
-    #[\Deprecated(since: '8.4', message: 'as it is no longer used')]
     const DOM_PHP_ERR = UNKNOWN;
     /**
      * @var int
@@ -1586,36 +1586,6 @@ namespace Dom
          */
         public string $tagName;
 
-        /**
-         * @readonly
-         */
-        public HTMLCollection $children;
-        /**
-         * @readonly
-         * @virtual
-         */
-        public ?Element $firstElementChild;
-        /**
-         * @readonly
-         * @virtual
-         */
-        public ?Element $lastElementChild;
-        /**
-         * @readonly
-         * @virtual
-         */
-        public int $childElementCount;
-        /**
-         * @readonly
-         * @virtual
-         */
-        public ?Element $previousElementSibling;
-        /**
-         * @readonly
-         * @virtual
-         */
-        public ?Element $nextElementSibling;
-
         /** @virtual */
         public string $id;
         /** @virtual */
@@ -1661,11 +1631,35 @@ namespace Dom
 
         public function getElementsByTagName(string $qualifiedName): HTMLCollection {}
         public function getElementsByTagNameNS(?string $namespace, string $localName): HTMLCollection {}
-        public function getElementsByClassName(string $classNames): HTMLCollection {}
 
         public function insertAdjacentElement(AdjacentPosition $where, Element $element): ?Element {}
         public function insertAdjacentText(AdjacentPosition $where, string $data): void {}
-        public function insertAdjacentHTML(AdjacentPosition $where, string $string): void {}
+
+        /**
+         * @readonly
+         * @virtual
+         */
+        public ?Element $firstElementChild;
+        /**
+         * @readonly
+         * @virtual
+         */
+        public ?Element $lastElementChild;
+        /**
+         * @readonly
+         * @virtual
+         */
+        public int $childElementCount;
+        /**
+         * @readonly
+         * @virtual
+         */
+        public ?Element $previousElementSibling;
+        /**
+         * @readonly
+         * @virtual
+         */
+        public ?Element $nextElementSibling;
 
         /** @implementation-alias DOMElement::setIdAttribute */
         public function setIdAttribute(string $qualifiedName, bool $isId): void {}
@@ -1695,9 +1689,6 @@ namespace Dom
 
         /** @virtual */
         public string $innerHTML;
-
-        /** @virtual */
-        public string $outerHTML;
 
         /** @virtual */
         public string $substitutedNodeValue;
@@ -1872,10 +1863,6 @@ namespace Dom
     {
         /**
          * @readonly
-         */
-        public HTMLCollection $children;
-        /**
-         * @readonly
          * @virtual
          */
         public ?Element $firstElementChild;
@@ -1942,26 +1929,6 @@ namespace Dom
 
     abstract class Document extends Node implements ParentNode
     {
-        /**
-         * @readonly
-         */
-        public HTMLCollection $children;
-        /**
-         * @readonly
-         * @virtual
-         */
-        public ?Element $firstElementChild;
-        /**
-         * @readonly
-         * @virtual
-         */
-        public ?Element $lastElementChild;
-        /**
-         * @readonly
-         * @virtual
-         */
-        public int $childElementCount;
-
         /** @readonly */
         public Implementation $implementation;
         /** @virtual */
@@ -1989,8 +1956,6 @@ namespace Dom
         public function getElementsByTagName(string $qualifiedName): HTMLCollection {}
         /** @implementation-alias Dom\Element::getElementsByTagNameNS */
         public function getElementsByTagNameNS(?string $namespace, string $localName): HTMLCollection {}
-        /** @implementation-alias Dom\Element::getElementsByClassName */
-        public function getElementsByClassName(string $classNames): HTMLCollection {}
 
         public function createElement(string $localName): Element {}
         public function createElementNS(?string $namespace, string $qualifiedName): Element {}
@@ -2011,6 +1976,22 @@ namespace Dom
         public function createAttribute(string $localName): Attr {}
         /** @implementation-alias DOMDocument::createAttributeNS */
         public function createAttributeNS(?string $namespace, string $qualifiedName): Attr {}
+
+        /**
+         * @readonly
+         * @virtual
+         */
+        public ?Element $firstElementChild;
+        /**
+         * @readonly
+         * @virtual
+         */
+        public ?Element $lastElementChild;
+        /**
+         * @readonly
+         * @virtual
+         */
+        public int $childElementCount;
 
         /** @implementation-alias DOMDocument::getElementById */
         public function getElementById(string $elementId): ?Element {}
@@ -2117,7 +2098,7 @@ namespace Dom
      * @not-serializable
      * @strict-properties
      */
-    final class TokenList implements \IteratorAggregate, \Countable
+    final class TokenList implements IteratorAggregate, Countable
     {
         /** @implementation-alias Dom\Node::__construct */
         private function __construct() {}
