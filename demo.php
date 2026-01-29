@@ -23,15 +23,10 @@ class DemoRewriteHandler extends BaseRewriteHandler
 }
 
 $tagrewriter = new Html5TagRewriter();
-$tagrewriter->register(new DemoRewriteHandler());
+#$tagrewriter->register(new DemoRewriteHandler());
 
 $document = <<<HTML
-<!DOCTYPE html>
-<html>
-<body>
-    <p><a href="#">link</a></p>
-</body>
-</html>
+    <p><a href="#">link</a><hr /><foo:bar /></p>
 HTML;
 
-echo $tagrewriter->process($document);
+echo $tagrewriter->processBodyFragment($document);

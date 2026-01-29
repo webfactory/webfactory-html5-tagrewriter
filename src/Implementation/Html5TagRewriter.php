@@ -27,11 +27,11 @@ final class Html5TagRewriter implements TagRewriter
     #[Override]
     public function process(string $html5): string
     {
-        $document = HTMLDocument::createFromString($html5, LIBXML_NOERROR);
+        $document = HTMLDocument::createFromString($this->convertEsiSelfClosingTagsToEmptyElements($html5), LIBXML_NOERROR);
 
         $this->applyHandlers($document, $document);
 
-        return $this->cleanup($document->saveHtml());
+        return $this->convertEsiEmptyElementsToSelfClosingTags($document->saveHtml());
     }
 
     #[Override]
@@ -51,11 +51,11 @@ final class Html5TagRewriter implements TagRewriter
         $container = $document->body;
         assert($container !== null);
 
-        $container->innerHTML = $html5Fragment;
+        $container->innerHTML = $this->convertEsiSelfClosingTagsToEmptyElements($html5Fragment);
 
         $this->applyHandlers($document, $container);
 
-        return $this->cleanup($container->innerHTML);
+        return $this->convertEsiEmptyElementsToSelfClosingTags($container->innerHTML);
     }
 
     private function applyHandlers(Document $document, Node $context): void
@@ -75,8 +75,13 @@ final class Html5TagRewriter implements TagRewriter
         }
     }
 
-    private function cleanup(string $html): string
+    private function convertEsiSelfClosingTagsToEmptyElements(string $html): string
     {
-        return preg_replace('#(<esi:([a-z]+)(?:[^>]*))></esi:\\2>#', '$1 />', $html) ?? $html;
+        return preg_replace('#(<esi:([a-z]+)(?:[^>]*))/>#i', '$1></esi:\\2>', $html);
+    }
+
+    private function convertEsiEmptyElementsToSelfClosingTags(string $html): string
+    {
+        return preg_replace('#(<esi:([a-z]+)(?:[^>]*))></esi:\\2>#i', '$1 />', $html);
     }
 }

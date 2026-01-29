@@ -185,7 +185,16 @@ class Html5TagRewriterTest extends TestCase
         ];
 
         yield 'ESI tag' => [
-            '<esi:include src="url" />',
+            '<esi:include src="url?foo=bar&amp;bar=baz" />',
+        ];
+
+        yield 'ESI tags in context' => [
+            '<div><p>test</p>
+                <hr>
+                <esi:include src="/_fragment?_hash=123&amp;foo=bar" />
+                <hr>
+                <esi:include src="/_fragment?_hash=456" />
+            </div>'
         ];
     }
 
@@ -201,8 +210,8 @@ class Html5TagRewriterTest extends TestCase
     public static function provideFragmentsCleanedUp(): iterable
     {
         yield 'empty ESI include tag' => [
-            '<esi:include src="url">',
-            '<esi:include src="url" />',
+            '<esi:include src="url?foo=bar&amp;bar=baz"/>',
+            '<esi:include src="url?foo=bar&amp;bar=baz" />',
         ];
 
         yield 'qouted entities are replaced' => [
